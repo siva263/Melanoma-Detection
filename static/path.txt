@@ -1,0 +1,6 @@
+vgg19_224/model.06-0.12.hdf5/
+vgg16_256/model.15-0.14.hdf5/
+simplified CNN_256/model.14-0.18.hdf5/
+resnet50_256/model.06-0.39.hdf5/
+mobilenetv2_224/model.02-0.13.hdf5/
+alexnet_227/weights-improvement-14-0.17.hdf5/
