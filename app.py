@@ -7,11 +7,10 @@ from tensorflow.keras.preprocessing.image import ImageDataGenerator
 
 app = Flask(__name__)
 
-UPLOAD_FOLDER = "uploads/all_class"  # Directory for uploading images
-STATIC_FOLDER = "static"  # Directory to store static files like the model
-STATIC_PATH = "static/"
+UPLOAD_FOLDER = "uploads/all_class"
+STATIC_FOLDER = "static"
 MODEL_FILENAME = "VGG19-224-model.06-0.12.hdf5"
-MODEL_PATH = os.path.join(STATIC_FOLDER, "VGG19-224-model.06-0.12.hdf5")
+MODEL_PATH = os.path.join(STATIC_FOLDER, MODEL_FILENAME)
 GOOGLE_DRIVE_FILE_ID = '1GcI419Ev7zwrSpWnEHVg4xDYI4kyuj-b'
 
 ALLOWED_EXTENSIONS = {'jpg', 'jpeg'}
@@ -19,7 +18,6 @@ IMAGE_SIZE = 224
 
 app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
 
-# Function to download file from Google Drive
 def download_file_from_google_drive(file_id, dest_path):
     URL = "https://drive.google.com/uc?export=download"
     session = requests.Session()
@@ -33,17 +31,14 @@ def download_file_from_google_drive(file_id, dest_path):
 
     save_response_content(response, dest_path)
 
-# Function to get the confirmation token from Google Drive
 def get_confirm_token(response):
     for key, value in response.cookies.items():
         if key.startswith('download_warning'):
             return value
     return None
 
-# Function to save the downloaded content to the destination path
 def save_response_content(response, dest_path):
     CHUNK_SIZE = 32768
-
     with open(dest_path, "wb") as f:
         for chunk in response.iter_content(CHUNK_SIZE):
             if chunk:
@@ -51,12 +46,15 @@ def save_response_content(response, dest_path):
 
 # Check if the model file exists, if not download it
 if not os.path.exists(MODEL_PATH):
-    print(f"Downloading model to {STATIC_PATH}...")
-    download_file_from_google_drive(GOOGLE_DRIVE_FILE_ID, STATIC_PATH)
-    print(f"Downloaded model to {STATIC_PATH}")
+    print(f"Downloading model to {MODEL_PATH}...")
+    download_file_from_google_drive(GOOGLE_DRIVE_FILE_ID, MODEL_PATH)
+    print(f"Downloaded model to {MODEL_PATH}")
 
-# Load the model from the specified path
+# Load the model
 model = load_model(MODEL_PATH, compile=False)
+
+# Rest of the code remains the same...
+
 
 # Function to check if the uploaded file is allowed
 def allowed_file(filename):
