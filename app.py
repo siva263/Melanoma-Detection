@@ -8,7 +8,6 @@ from tensorflow.keras.preprocessing.image import ImageDataGenerator
 
 app = Flask(__name__)
 
-dir_path = os.path.dirname(os.path.realpath(__file__))
 UPLOAD_FOLDER = "uploads/all_class"
 STATIC_FOLDER = "static"
 MODEL_FILENAME = "VGG19-224-model.06-0.12.hdf5"
@@ -56,46 +55,29 @@ model = load_model(MODEL_PATH, compile=False)
 def allowed_file(filename):
     return '.' in filename and filename.rsplit('.', 1)[1].lower() in ALLOWED_EXTENSIONS
 
-def load_and_preprocess_image():
-    test_fldr = 'uploads'
+def load_and_preprocess_image(image_path):
     test_generator = ImageDataGenerator(rescale=1. / 255).flow_from_directory(
-        test_fldr,
+        os.path.dirname(image_path),
         target_size=(IMAGE_SIZE, IMAGE_SIZE),
+        classes=[os.path.basename(os.path.dirname(image_path))],
         batch_size=1,
         class_mode=None,
         shuffle=False)
     test_generator.reset()
     return test_generator
 
-def classify(model):
-    batch_size = 1
-    test_generator = load_and_preprocess_image()
-    prob = model.predict(test_generator, steps=len(test_generator) / batch_size)
+def classify(image_path, model):
+    test_generator = load_and_preprocess_image(image_path)
+    prob = model.predict(test_generator)
     labels = {0: 'Just another beauty mark', 1: 'Get that mole checked out'}
     label = labels[1] if prob[0][0] >= 0.5 else labels[0]
     classified_prob = prob[0][0] if prob[0][0] >= 0.5 else 1 - prob[0][0]
     return label, classified_prob
 
-@app.route("/", methods=['GET'])
+@app.route("/", methods=['GET', 'POST'])
 def home():
-    filelist = glob.glob(os.path.join(UPLOAD_FOLDER, '*.*'))
-    for filePath in filelist:
-        try:
-            os.remove(filePath)
-        except:
-            print("Error while deleting file")
-    return render_template("home.html")
-
-@app.route("/classify", methods=["POST", "GET"])
-def upload_file():
-    if request.method == "GET":
-        return render_template("home.html")
-    else:
-        if 'image' not in request.files:
-            return redirect(request.url)
+    if request.method == 'POST':
         file = request.files['image']
-        if file.filename == '':
-            return redirect(request.url)
         if file and allowed_file(file.filename):
             filename = secure_filename(file.filename)
             if not os.path.exists(UPLOAD_FOLDER):
@@ -103,18 +85,18 @@ def upload_file():
             upload_image_path = os.path.join(app.config['UPLOAD_FOLDER'], filename)
             file.save(upload_image_path)
 
-            label, prob = classify(model)
+            label, prob = classify(upload_image_path, model)
             prob = round((prob * 100), 2)
 
             return render_template(
                 "classify.html", image_file_name=filename, label=label, prob=prob
             )
-        else:
-            return redirect(request.url)
+
+    return render_template("home.html")
 
 @app.route("/classify/<filename>")
 def send_file(filename):
     return send_from_directory(app.config['UPLOAD_FOLDER'], filename)
 
 if __name__ == "__main__":
-    app.run(host='0.0.0.0', debug=True)
+    app.run(debug=True)
