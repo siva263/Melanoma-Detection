@@ -9,6 +9,7 @@ app = Flask(__name__)
 
 UPLOAD_FOLDER = "uploads/all_class"  # Directory for uploading images
 STATIC_FOLDER = "static"  # Directory to store static files like the model
+STATIC_PATH = "static/"
 MODEL_FILENAME = "VGG19-224-model.06-0.12.hdf5"
 MODEL_PATH = os.path.join(STATIC_FOLDER, "VGG19-224-model.06-0.12.hdf5")
 GOOGLE_DRIVE_FILE_ID = '1GcI419Ev7zwrSpWnEHVg4xDYI4kyuj-b'
@@ -50,9 +51,9 @@ def save_response_content(response, dest_path):
 
 # Check if the model file exists, if not download it
 if not os.path.exists(MODEL_PATH):
-    print(f"Downloading model to {STATIC_FOLDER}...")
-    download_file_from_google_drive(GOOGLE_DRIVE_FILE_ID, STATIC_FOLDER)
-    print(f"Downloaded model to {STATIC_FOLDER}")
+    print(f"Downloading model to {STATIC_PATH}...")
+    download_file_from_google_drive(GOOGLE_DRIVE_FILE_ID, STATIC_PATH)
+    print(f"Downloaded model to {STATIC_PATH}")
 
 # Load the model from the specified path
 model = load_model(MODEL_PATH, compile=False)
