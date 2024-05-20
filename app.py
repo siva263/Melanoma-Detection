@@ -4,7 +4,6 @@ import requests
 from flask import Flask, render_template, request, send_from_directory, redirect, url_for
 from werkzeug.utils import secure_filename
 from tensorflow.keras.models import load_model
-from tensorflow.keras.preprocessing.image import ImageDataGenerator
 
 app = Flask(__name__)
 
@@ -55,25 +54,6 @@ model = load_model(MODEL_PATH, compile=False)
 def allowed_file(filename):
     return '.' in filename and filename.rsplit('.', 1)[1].lower() in ALLOWED_EXTENSIONS
 
-def load_and_preprocess_image(image_path):
-    test_generator = ImageDataGenerator(rescale=1. / 255).flow_from_directory(
-        os.path.dirname(image_path),
-        target_size=(IMAGE_SIZE, IMAGE_SIZE),
-        classes=[os.path.basename(os.path.dirname(image_path))],
-        batch_size=1,
-        class_mode=None,
-        shuffle=False)
-    test_generator.reset()
-    return test_generator
-
-def classify(image_path, model):
-    test_generator = load_and_preprocess_image(image_path)
-    prob = model.predict(test_generator)
-    labels = {0: 'Just another beauty mark', 1: 'Get that mole checked out'}
-    label = labels[1] if prob[0][0] >= 0.5 else labels[0]
-    classified_prob = prob[0][0] if prob[0][0] >= 0.5 else 1 - prob[0][0]
-    return label, classified_prob
-
 @app.route("/", methods=['GET', 'POST'])
 def home():
     if request.method == 'POST':
@@ -85,12 +65,7 @@ def home():
             upload_image_path = os.path.join(app.config['UPLOAD_FOLDER'], filename)
             file.save(upload_image_path)
 
-            label, prob = classify(upload_image_path, model)
-            prob = round((prob * 100), 2)
-
-            return render_template(
-                "classify.html", image_file_name=filename, label=label, prob=prob
-            )
+            # Add code here to classify the uploaded image using the `model`
 
     return render_template("home.html")
 
