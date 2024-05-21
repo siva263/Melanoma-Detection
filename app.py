@@ -12,13 +12,15 @@ app = Flask(__name__)
 UPLOAD_FOLDER = "uploads/all_class"
 STATIC_FOLDER = "static"
 MODEL_FILENAME = "VGG19-224-model.06-0.12.hdf5"
-MODEL_PATH = os.path.join(STATIC_FOLDER, MODEL_FILENAME)
+# Removed the path definition for MODEL_PATH
+
 GOOGLE_DRIVE_FILE_ID = '1GcI419Ev7zwrSpWnEHVg4xDYI4kyuj-b'
 
 ALLOWED_EXTENSIONS = {'jpg', 'jpeg'}
 IMAGE_SIZE = 224
 
 app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
+
 
 def download_file_from_google_drive(file_id, dest_path):
     URL = "https://drive.google.com/uc?export=download"
@@ -33,11 +35,13 @@ def download_file_from_google_drive(file_id, dest_path):
 
     save_response_content(response, dest_path)
 
+
 def get_confirm_token(response):
     for key, value in response.cookies.items():
         if key.startswith('download_warning'):
             return value
     return None
+
 
 def save_response_content(response, dest_path):
     CHUNK_SIZE = 32768
@@ -46,14 +50,18 @@ def save_response_content(response, dest_path):
             if chunk:
                 f.write(chunk)
 
-# Check if the model file exists, if not download it
-if not os.path.exists(MODEL_PATH):
-    print(f"Downloading model to {MODEL_PATH}...")
-    download_file_from_google_drive(GOOGLE_DRIVE_FILE_ID, MODEL_PATH)
-    print(f"Downloaded model to {MODEL_PATH}")
 
-# Load the model
-model = tf.keras.models.load_model(MODEL_PATH, compile=False)
+# This section checks if a model file exists. 
+# If not, it downloads it from Google Drive during deployment 
+# (assuming the appropriate setup is done on the server)
+model_path = os.path.join(STATIC_FOLDER, MODEL_FILENAME)
+if not os.path.exists(model_path):
+    print(f"Downloading model to {model_path}...")
+    download_file_from_google_drive(GOOGLE_DRIVE_FILE_ID, model_path)
+    print(f"Downloaded model to {model_path}")
+
+# Load the model (path is now set dynamically)
+model = tf.keras.models.load_model(model_path, compile=False)
 
 def allowed_file(filename):
     return '.' in filename and filename.rsplit('.', 1)[1].lower() in ALLOWED_EXTENSIONS
