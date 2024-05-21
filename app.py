@@ -5,6 +5,7 @@ from werkzeug.utils import secure_filename
 from tensorflow.keras.models import load_model
 from tensorflow.keras.preprocessing.image import ImageDataGenerator
 import glob
+import tensorflow as tf
 
 app = Flask(__name__)
 
@@ -52,7 +53,7 @@ if not os.path.exists(MODEL_PATH):
     print(f"Downloaded model to {MODEL_PATH}")
 
 # Load the model
-model = tensorflow.keras.models.load_model(MODEL_PATH, compile=False)
+model = tf.keras.models.load_model(MODEL_PATH, compile=False)
 
 def allowed_file(filename):
     return '.' in filename and filename.rsplit('.', 1)[1].lower() in ALLOWED_EXTENSIONS
