@@ -10,7 +10,7 @@ app = Flask(__name__)
 UPLOAD_FOLDER = "uploads/all_class"
 STATIC_FOLDER = "static"
 MODEL_FILENAME = "VGG19-224-model.06-0.12.hdf5"
-MODEL_PATH = os.path.join(STATIC_FOLDER, MODEL_FILENAME)
+MODEL_PATH = os.path.join(STATIC_FOLDER, "VGG19-224-model.06-0.12.hdf5")
 GOOGLE_DRIVE_FILE_ID = '1GcI419Ev7zwrSpWnEHVg4xDYI4kyuj-b'
 
 ALLOWED_EXTENSIONS = {'jpg', 'jpeg'}
