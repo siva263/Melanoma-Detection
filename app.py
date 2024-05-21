@@ -4,13 +4,14 @@ from flask import Flask, render_template, request, send_from_directory, redirect
 from werkzeug.utils import secure_filename
 from tensorflow.keras.models import load_model
 from tensorflow.keras.preprocessing.image import ImageDataGenerator
+import glob
 
 app = Flask(__name__)
 
 UPLOAD_FOLDER = "uploads/all_class"
 STATIC_FOLDER = "static"
 MODEL_FILENAME = "VGG19-224-model.06-0.12.hdf5"
-MODEL_PATH = os.path.join(STATIC_FOLDER, "VGG19-224-model.06-0.12.hdf5")
+MODEL_PATH = os.path.join(STATIC_FOLDER, MODEL_FILENAME)
 GOOGLE_DRIVE_FILE_ID = '1GcI419Ev7zwrSpWnEHVg4xDYI4kyuj-b'
 
 ALLOWED_EXTENSIONS = {'jpg', 'jpeg'}
@@ -53,14 +54,9 @@ if not os.path.exists(MODEL_PATH):
 # Load the model
 model = load_model(MODEL_PATH, compile=False)
 
-# Rest of the code remains the same...
-
-
-# Function to check if the uploaded file is allowed
 def allowed_file(filename):
     return '.' in filename and filename.rsplit('.', 1)[1].lower() in ALLOWED_EXTENSIONS
 
-# Function to load and preprocess the image for prediction
 def load_and_preprocess_image():
     test_fldr = 'uploads'
     test_generator = ImageDataGenerator(rescale=1. / 255).flow_from_directory(
@@ -72,7 +68,6 @@ def load_and_preprocess_image():
     test_generator.reset()
     return test_generator
 
-# Function to classify the uploaded image using the model
 def classify(model):
     batch_size = 1
     test_generator = load_and_preprocess_image()
