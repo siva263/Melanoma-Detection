@@ -52,7 +52,7 @@ def save_response_content(response, dest_path):
 
 # This section checks if a model file exists. 
 # If not, it downloads it from Google Drive during deployment  
-model_path = os.path.join(STATIC_FOLDER, MODEL_FILENAME)
+model_path = os.path.join(STATIC_FOLDER, "VGG19-224-model.06-0.12.hdf5")
 if not os.path.exists(model_path):
     print(f"Downloading model to {model_path}...")
     download_file_from_google_drive(GOOGLE_DRIVE_FILE_ID, model_path)
@@ -60,7 +60,7 @@ if not os.path.exists(model_path):
 
 # Load the model only if it exists (prevents initial error)
 if os.path.exists(model_path):
-    model = tf.keras.models.load_model(model_path, compile=False)
+    model = load_model(model_path, compile=False)
 else:
     print("Model file not found. Please ensure the model is downloaded or the path is correct.")
 
