@@ -52,7 +52,7 @@ if not os.path.exists(MODEL_PATH):
     print(f"Downloaded model to {MODEL_PATH}")
 
 # Load the model
-model = load_model(MODEL_PATH, compile=False)
+model = tensorflow.keras.models.load_model(MODEL_PATH, compile=False)
 
 def allowed_file(filename):
     return '.' in filename and filename.rsplit('.', 1)[1].lower() in ALLOWED_EXTENSIONS
